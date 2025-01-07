@@ -1,0 +1,42 @@
+# .NET build artifacts
+bin/
+obj/
+bin/*
+obj/*
+
+# Zależności NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+
+# Folder z przywróconymi pakietami NuGet
+packages/
+!.nuget/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.swp
+*.sln.docstates
+
+# VSCode settings
+.vscode/
+
+# npm artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Tailwind output
+wwwroot/css/site.css
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+
