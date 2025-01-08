@@ -1,10 +1,22 @@
 <div class="w-full h-24 bg-[#AB0B19] fixed top-0 z-50 text-white">
-    <div class="flex w-full h-full items-center justify-center">
-        <div class="h-8 w-fit object-cover bg-blue-950">
-            <img src="/title.png" class="w-full h-full object-contain">
+    <div class="flex w-full h-full items-center justify-between px-12">
+        <div class="h-8 w-fit object-cover">
+            <NavLink href="">
+            <img src="/title.png" class="w-full h-full object-contain cursor-pointer">
+            </NavLink>
         </div>
-        <div class="bg-blue-700 w-10 h-10"></div>
-        <div class="bg-blue-800 w-10 h-10"></div>
-        <div class="bg-blue-900 w-10 h-10"></div>
+        <div class="flex gap-12">
+            <div class=" w-12 h-12 cursor-pointer">
+                <NavLink href="menu">
+                    <img src="pizzaicon.png">
+                </NavLink>
+            </div>
+            <div class=" w-12 h-12 cursor-pointer">
+                <NavLink href="cart">
+                    <img src="cart.png">
+                </NavLink>
+            </div>
+        </div>
     </div>
+
 </div>
