@@ -1,0 +1,50 @@
+@page "/cart"
+
+<div class="flex justify-center gap-12 bg-[#F3EFF0]">
+    <div class="mt-32 flex flex-col gap-4">
+        <Menu/>
+        <Menu/>
+        <div class="w-full p-4 mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+            <p class="text-xl">Wysokość zamówienia wynosi: zmienna</p>
+        </div>
+    </div>
+    <div class="mt-32 flex flex-col gap-4 items-center">
+        <div class="w-full p-4 mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+            <form class="flex flex-col gap-4 items-end">
+                <label>
+                    <div class="flex flex-col">
+                    Imię i nazwisko:
+                    <input type="text" name="fullname" class="border border-gray-300 p-2 rounded" required>
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                    Miejscowość:
+                    <input type="text" name="city" class="border border-gray-300 p-2 rounded" required>
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                    Ulica:
+                    <input type="text" name="street" class="border border-gray-300 p-2 rounded" required>
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                    Numer telefonu:
+                    <input type="tel" name="phone" class="border border-gray-300 p-2 rounded" required pattern="[0-9]{9}">
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                    Uwagi do zamówienia:
+                    <textarea name="comments" class="border border-gray-300 p-3 rounded"></textarea>
+                    </div>
+                </label>
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded ">
+                    Zamów
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
