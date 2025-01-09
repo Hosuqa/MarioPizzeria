@@ -1,0 +1,39 @@
+<div class="mt-32 w-[350px] flex flex-col items-center">
+        <div class="w-full p-4 mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+            <form class="flex flex-col gap-3">
+                <label>
+                    <div class="flex flex-col ">
+                        <p class="mb-2">Imię i nazwisko:  </p>
+                        <input type="text" name="fullname" class="border border-gray-300 p-2 rounded" required>
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                        <p class="mb-2">Miejscowość: </p>
+                        <input type="text" name="city" class="border border-gray-300 p-2 rounded" required>
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                        <p class="mb-2">Ulica: </p>
+                        <input type="text" name="street" class="border border-gray-300 p-2 rounded" required>
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                        <p class="mb-2">Numer telefonu: </p>
+                        <input type="tel" name="phone" class="border border-gray-300 p-2 rounded" required pattern="[0-9]{9}">
+                    </div>
+                </label>
+                <label>
+                    <div class="flex flex-col">
+                        <p class="mb-2">Uwagi do zamówienia: </p>
+                        <textarea name="comments" class="border border-gray-300 p-3 rounded"></textarea>
+                    </div>
+                </label>
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded ">
+                    Zamów
+                </button>
+            </form>
+        </div>
+    </div>
