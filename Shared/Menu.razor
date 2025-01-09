@@ -1,11 +1,11 @@
 
-<div class="w-[700px] mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl relative h-full">
-    <div class="flex items-center p-4 h-full">
-        <div class="h-full w-60 m-6 absolute -left-32 bottom-0">
+<div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4 ">
+    <div class="flex items-center p-4 h-full group">
+        <div class="h-full w-80 m-6 absolute -left-32 bottom-0 group-hover:scale-[105%] duration-300">
             <img src="/pizza6.png" alt="Peperoni" class="w-full h-fit" />
         </div>
-        <div class="flex-grow ml-32">
-            <h2 class="text-[24px] mb-2 font-bold">Peperoni</h2>
+        <div class="flex-grow ml-56 h-[80px] flex flex-col justify-center">
+            <h2 class="text-[26px] mb-2 font-bold">Peperoni</h2>
             <p class="text-gray-600 text-sm">
                 Ser, szynka, kokos, pomarańcza <br />
                 + sos ogórkowy
@@ -13,8 +13,8 @@
         </div>
         <div class="text-right h-full">
             <div class="flex h-full items-center ">
-                <div class="flex flex-col h-full gap-2">
-                    <span class="text-lg font-semibold">34.90 PLN</span>
+                <div class="flex flex-col h-full gap-2 h-full w-28">
+                    <span class="text-lg flex justify-center font-semibold">@Price.ToString("F2") PLN</span>
                     <div class="flex gap-2 justify-center ">
                         <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="DecrementQuantity">
                             <img src="minus.png">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 <div class="mx-4 h-14 w-[2px] bg-black"></div>
-                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300">
+                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2">
                     <img src="blackcart.png">
                 </div>
             </div>
@@ -35,10 +35,19 @@
 </div>
 
 @code {
-    private int Quantity { get; set; } = 1;
+private int Quantity { get; set; } = 1;
+    private double BasePrice { get; } = 34.90;
+    private double Price { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Price = BasePrice;
+    }
+
     private void IncrementQuantity()
     {
         Quantity++;
+        UpdatePrice();
     }
 
     private void DecrementQuantity()
@@ -46,6 +55,13 @@
         if (Quantity > 1)
         {
             Quantity--;
+            UpdatePrice();
         }
+    }
+
+    private void UpdatePrice()
+    {
+        Price = Quantity * BasePrice;
+        StateHasChanged();
     }
 }
