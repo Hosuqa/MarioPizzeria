@@ -35,6 +35,15 @@ namespace MarioPizzeria.Services
         {
             return Items.Sum(item => item.TotalPrice);
         }
+        //usuwanie z koszyka
+        public void RemoveFromCart(int pizzaId)
+        {
+            var itemToRemove = Items.FirstOrDefault(item => item.PizzaId == pizzaId);
+            if (itemToRemove != null)
+            {
+                Items.Remove(itemToRemove);
+            }
+        }
     }
 
     public class CartItem
