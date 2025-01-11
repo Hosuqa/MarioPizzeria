@@ -16,8 +16,8 @@
         {
             <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4 ">
                 <div class="flex items-center p-4 h-full group">
-                    <div class="h-full w-80 m-6 absolute -left-32 bottom-0 group-hover:scale-[105%] duration-300">
-                        <img src="@pizza.ImageUrl" alt="@pizza.Name" class="w-full h-fit" draggable="false"/>
+                    <div class="h-full w-80 m-6 absolute -left-32 bottom-10 group-hover:scale-[105%] duration-300">
+                        <img src="@($"{pizza.Name}.png")" alt="@pizza.Name" class="w-full h-fit" draggable="false"/>
                     </div>
                     <div class="flex-grow ml-56 h-[80px] flex flex-col justify-center">
                         <h2 class="text-[26px] mb-2 font-bold">@pizza.Name</h2>
@@ -58,7 +58,7 @@
 </div>
 
 @code {
-    private List<MarioPizzeria.Models.Pizza> pizzas;
+        private List<MarioPizzeria.Models.Pizza> pizzas;
     private Dictionary<int, int> pizzaQuantities = new Dictionary<int, int>(); // Słownik do przechowywania ilości pizzy
     private Dictionary<int, float> Price = new Dictionary<int, float>(); // Słownik do przechowywania ilości pizzy
 
