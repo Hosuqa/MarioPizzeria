@@ -31,6 +31,10 @@ namespace MarioPizzeria.Services
         {
             Items.Clear();
         }
+        public float GetTotalPrice()
+        {
+            return Items.Sum(item => item.TotalPrice);
+        }
     }
 
     public class CartItem

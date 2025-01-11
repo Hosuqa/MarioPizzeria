@@ -43,7 +43,7 @@
                                     </div>
                                 </div>
                                 <div class="mx-4 h-14 w-[2px] bg-black"></div>
-                                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2" @onclick="() => AddToCart(pizza)">
+                                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2" @onclick="() => HandleCartAndPopUp(pizza)">
                                     <img src="blackcart.png">
                                 </div>
                         </div>
@@ -58,13 +58,28 @@
             Przejdź do podsumowania
         </div>
     </NavLink>
+    
 </div>
+   @if (showPopUp)
+    {
+        <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-xl shadow-md p-6 w-1/2 text-center">
+                <h2 class="text-2xl font-bold mb-4">Zamówienie</h2>
+                <p class="text-lg">@popUpMessage</p>
+                <button class="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300"
+                        @onclick="ClosePopUp">
+                    Zamknij
+                </button>
+            </div>
+        </div>
+    }
 
 @code {
     private List<MarioPizzeria.Models.Pizza>? pizzas;
     private Dictionary<int, int> pizzaQuantities = new Dictionary<int, int>(); // Słownik do przechowywania ilości pizzy
     private Dictionary<int, float> Price = new Dictionary<int, float>(); // Słownik do przechowywania ilości pizzy
-
+    private bool showPopUp = false; // Czy modal jest widoczny
+    private string popUpMessage = ""; // Treść modal
     protected override async Task OnInitializedAsync()
     {
         pizzas = await PizzaService.GetPizzasAsync();
@@ -110,13 +125,31 @@
         StateHasChanged(); 
     }
     private void AddToCart(MarioPizzeria.Models.Pizza pizza)
-{
-    CartService.AddToCart(
-        pizza.Id,
-        pizza.Name,
-        pizza.Description,
-        GetQuantity(pizza),
-        pizza.BasePrice
-    );
-}
+    {
+        CartService.AddToCart(
+            pizza.Id,
+            pizza.Name,
+            pizza.Description,
+            GetQuantity(pizza),
+            pizza.BasePrice
+        ); 
+    }
+    private void ShowPopUp(MarioPizzeria.Models.Pizza pizza)
+    {
+        var quantity = GetQuantity(pizza);
+        popUpMessage = $"Zamówiłeś {quantity} pizze {pizza.Name}";
+        showPopUp = true;
+    }
+
+    private void ClosePopUp()
+    {
+        showPopUp = false;
+    }
+    private void HandleCartAndPopUp(MarioPizzeria.Models.Pizza pizza)
+    {
+        AddToCart(pizza);
+        ShowPopUp(pizza);
+        pizzaQuantities[pizza.Id] = 1;
+        Price[pizza.Id] = pizza.BasePrice;
+    }
 }
