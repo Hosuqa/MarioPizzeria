@@ -12,6 +12,7 @@
     }
     else
     {
+        <p class="pb-8 text-gray-900 opacity-75">Wszystkie Pizze w naszej pizzeri występują w rozmiarze 35cm</p>
         @foreach (var pizza in pizzas)
         {
             <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4 ">
@@ -51,7 +52,7 @@
     }
 
     <NavLink href="cart">
-        <div class="mt-4 h-fit text-white justify-between flex p-4 mx-auto bg-red-500 rounded-xl shadow-md overflow-hidden hover:bg-red-600 cursor-pointer transition-all duration-300">
+        <div class="mb-4 h-fit text-white justify-between flex p-4 mx-auto bg-red-500 rounded-xl shadow-md overflow-hidden hover:bg-red-600 cursor-pointer transition-all duration-300">
             Przejdź do podsumowania
         </div>
     </NavLink>
