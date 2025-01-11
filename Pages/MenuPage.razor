@@ -1,5 +1,7 @@
 @page "/menu"
 @inject MarioPizzeria.Services.PizzaService PizzaService
+@inject MarioPizzeria.Services.CartService CartService
+
 
 <div class="pt-32 flex flex-col items-center relative min-vh-100">
     @if (pizzas == null)
@@ -41,7 +43,7 @@
                                     </div>
                                 </div>
                                 <div class="mx-4 h-14 w-[2px] bg-black"></div>
-                                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2">
+                                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2" @onclick="() => AddToCart(pizza)">
                                     <img src="blackcart.png">
                                 </div>
                         </div>
@@ -59,7 +61,7 @@
 </div>
 
 @code {
-        private List<MarioPizzeria.Models.Pizza> pizzas;
+    private List<MarioPizzeria.Models.Pizza>? pizzas;
     private Dictionary<int, int> pizzaQuantities = new Dictionary<int, int>(); // Słownik do przechowywania ilości pizzy
     private Dictionary<int, float> Price = new Dictionary<int, float>(); // Słownik do przechowywania ilości pizzy
 
@@ -107,4 +109,14 @@
         Price[pizza.Id] = pizzaQuantities[pizza.Id] * pizza.BasePrice;
         StateHasChanged(); 
     }
+    private void AddToCart(MarioPizzeria.Models.Pizza pizza)
+{
+    CartService.AddToCart(
+        pizza.Id,
+        pizza.Name,
+        pizza.Description,
+        GetQuantity(pizza),
+        pizza.BasePrice
+    );
+}
 }
