@@ -2,7 +2,6 @@
 @inject MarioPizzeria.Services.PizzaService PizzaService
 @inject MarioPizzeria.Services.CartService CartService
 
-
 <div class="pt-32 flex flex-col items-center relative min-vh-100">
     @if (pizzas == null)
     {
@@ -14,38 +13,39 @@
     }
     else
     {
-        <p class="pb-8 text-gray-900 opacity-75">Wszystkie Pizze w naszej pizzeri występują w rozmiarze 35cm</p>
+        <div class="w-[800px] mb-8 flex p-4 bg-white rounded-xl shadow-md overflow-hidden flex-col">
+            <p class="text-center text-[30px] text-red-500 font-bold mb-2">MENU</p>
+            <p class="text-center text-gray-900 font-semibold opacity-75">Wszystkie Pizze w naszej pizzerii występują w rozmiarze 35cm!</p>
+        </div>
         @foreach (var pizza in pizzas)
         {
-            <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4 ">
+            <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4">
                 <div class="flex items-center p-4 h-full group">
                     <div class="h-full w-80 m-6 absolute -left-32 bottom-10 group-hover:scale-[105%] duration-300">
                         <img src="@($"{pizza.Name}.png")" alt="@pizza.Name" class="w-full h-fit" draggable="false"/>
                     </div>
                     <div class="flex-grow ml-56 h-[80px] flex flex-col justify-center">
                         <h2 class="text-[26px] mb-2 font-bold">@pizza.Name</h2>
-                        <p class="text-gray-600 text-sm">
-                            @pizza.Description
-                        </p>
+                        <p class="text-gray-600 text-sm pr-12">@pizza.Description</p>
                     </div>
                     <div class="text-right h-full">
-                        <div class="flex h-full items-center ">
-                                <div class="flex flex-col h-full gap-2 h-full w-28">
-                                    <span class="text-lg flex justify-center font-semibold">@Price[pizza.Id].ToString("F2") PLN</span>
-                                    <div class="flex gap-2 justify-center ">
-                                        <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => DecrementQuantity(pizza)">
-                                            <img src="minus.png">
-                                        </div>
-                                        <p class="font-bold">@GetQuantity(pizza)</p>
-                                        <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => IncrementQuantity(pizza)">
-                                            <img src="add.png">
-                                        </div>
+                        <div class="flex h-full items-center">
+                            <div class="flex flex-col h-full gap-2 h-full w-28">
+                                <span class="text-lg flex justify-center font-semibold">@Price[pizza.Id].ToString("F2") PLN</span>
+                                <div class="flex gap-2 justify-center">
+                                    <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => DecrementQuantity(pizza)">
+                                        <img src="minus.png">
+                                    </div>
+                                    <p class="font-bold">@GetQuantity(pizza)</p>
+                                    <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => IncrementQuantity(pizza)">
+                                        <img src="add.png">
                                     </div>
                                 </div>
-                                <div class="mx-4 h-14 w-[2px] bg-black"></div>
-                                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2" @onclick="() => HandleCartAndPopUp(pizza)">
-                                    <img src="blackcart.png">
-                                </div>
+                            </div>
+                            <div class="mx-4 h-14 w-[2px] bg-black"></div>
+                            <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2" @onclick="() => HandleCartAndPopUp(pizza)">
+                                <img src="blackcart.png">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -58,28 +58,48 @@
             Przejdź do podsumowania
         </div>
     </NavLink>
-    
 </div>
-   @if (showPopUp)
-    {
-        <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
-            <div class="bg-white rounded-xl shadow-md p-6 w-1/2 text-center">
-                <h2 class="text-2xl font-bold mb-4">Zamówienie</h2>
-                <p class="text-lg">@popUpMessage</p>
-                <button class="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300"
-                        @onclick="ClosePopUp">
-                    Zamknij
-                </button>
+
+@if (showPopUp)
+{
+    <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white h-fit w-[600px] rounded-xl shadow-md p-6 text-center relative">
+            <!-- Przycisk zamykania (X) -->
+            <button class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 transition-all duration-200"
+                    @onclick="ClosePopUp">
+                <span class="material-icons">close</span>
+            </button>
+
+            <h2 class="text-2xl font-bold mb-4">Zamówienie</h2>
+            <p class="text-lg">@popUpMessage</p>
+
+            <!-- Licznik czasu do zamknięcia -->
+            <p class="text-sm text-gray-500 mt-2">Zamknięcie za: <span class="font-bold">@popupCountdown</span> s</p>
+
+            <div class="flex flex-row items-center justify-center mt-4 gap-2">
+                <div>
+                    <button class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300"
+                            @onclick="ClosePopUp">
+                        Kontynuuj zakupy
+                    </button>
+                </div>
+                <NavLink href="cart"> 
+                    <button class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300">
+                        Podsumowanie
+                    </button>
+                </NavLink>
             </div>
         </div>
-    }
-
+    </div>
+}
 @code {
     private List<MarioPizzeria.Models.Pizza>? pizzas;
-    private Dictionary<int, int> pizzaQuantities = new Dictionary<int, int>(); // Słownik do przechowywania ilości pizzy
-    private Dictionary<int, float> Price = new Dictionary<int, float>(); // Słownik do przechowywania ilości pizzy
-    private bool showPopUp = false; // Czy modal jest widoczny
-    private string popUpMessage = ""; // Treść modal
+    private Dictionary<int, int> pizzaQuantities = new Dictionary<int, int>();
+    private Dictionary<int, float> Price = new Dictionary<int, float>();
+
+    private bool showPopUp = false;
+    private string popUpMessage = "";
+    private int popupCountdown = 5;
     protected override async Task OnInitializedAsync()
     {
         pizzas = await PizzaService.GetPizzasAsync();
@@ -87,15 +107,14 @@
         {
             foreach (var pizza in pizzas)
             {
-                Price[pizza.Id] = pizza.BasePrice; // Ustaw podstawową cenę pizzy
-                pizzaQuantities[pizza.Id] = 1; // Ustaw domyślną ilość na 1
+                Price[pizza.Id] = pizza.BasePrice;
+                pizzaQuantities[pizza.Id] = 1;
             }
         }
     }
 
     private int GetQuantity(MarioPizzeria.Models.Pizza pizza)
     {
-        // Zwraca ilość pizzy, jeśli istnieje w słowniku, lub domyślnie 1
         return pizzaQuantities.ContainsKey(pizza.Id) ? pizzaQuantities[pizza.Id] : 1;
     }
 
@@ -103,7 +122,7 @@
     {
         if (!pizzaQuantities.ContainsKey(pizza.Id))
         {
-            pizzaQuantities[pizza.Id] = 1; // Ustawienie domyślnej ilości na 1
+            pizzaQuantities[pizza.Id] = 1;
         }
 
         pizzaQuantities[pizza.Id]++;
@@ -122,8 +141,9 @@
     private void UpdatePrice(MarioPizzeria.Models.Pizza pizza)
     {
         Price[pizza.Id] = pizzaQuantities[pizza.Id] * pizza.BasePrice;
-        StateHasChanged(); 
+        StateHasChanged();
     }
+
     private void AddToCart(MarioPizzeria.Models.Pizza pizza)
     {
         CartService.AddToCart(
@@ -132,23 +152,41 @@
             pizza.Description,
             GetQuantity(pizza),
             pizza.BasePrice
-        ); 
+        );
     }
-    private void ShowPopUp(MarioPizzeria.Models.Pizza pizza)
+
+ private async Task ShowPopUp(MarioPizzeria.Models.Pizza pizza)
     {
         var quantity = GetQuantity(pizza);
         popUpMessage = $"Zamówiłeś {quantity} pizze {pizza.Name}";
         showPopUp = true;
+        popupCountdown = 5;
+        StateHasChanged();
+
+        while (popupCountdown > 0)
+        {
+            await Task.Delay(1000);
+            popupCountdown--;
+            StateHasChanged();
+        }
+
+        if (showPopUp) // Jeśli użytkownik nie zamknął popupu ręcznie
+        {
+            ClosePopUp();
+        }
     }
 
     private void ClosePopUp()
     {
         showPopUp = false;
+        popupCountdown = 0;
+        StateHasChanged();
     }
-    private void HandleCartAndPopUp(MarioPizzeria.Models.Pizza pizza)
+
+    private async Task HandleCartAndPopUp(MarioPizzeria.Models.Pizza pizza)
     {
         AddToCart(pizza);
-        ShowPopUp(pizza);
+        await ShowPopUp(pizza);
         pizzaQuantities[pizza.Id] = 1;
         Price[pizza.Id] = pizza.BasePrice;
     }
