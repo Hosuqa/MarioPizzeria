@@ -5,7 +5,7 @@ namespace MarioPizzeria.Models
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public decimal Price { get; set; }
+        public float BasePrice { get; set; }
         public string ImageUrl { get; set; } = "/pizza1.png";
     }
 }

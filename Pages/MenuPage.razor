@@ -12,42 +12,41 @@
     }
     else
     {
-    @foreach (var pizza in pizzas)
-    {
-        <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4 ">
-            <div class="flex items-center p-4 h-full group">
-                <div class="h-full w-80 m-6 absolute -left-32 bottom-0 group-hover:scale-[105%] duration-300">
-                    <img src="@pizza.ImageUrl" alt="@pizza.Name" class="w-full h-fit" draggable="false"/>
-                </div>
-                <div class="flex-grow ml-56 h-[80px] flex flex-col justify-center">
-                    <h2 class="text-[26px] mb-2 font-bold">@pizza.Name</h2>
-                    <p class="text-gray-600 text-sm">
-                        @pizza.Description
-                    </p>
-                </div>
-                <div class="text-right h-full">
-                    <div class="flex h-full items-center ">
-                        <div class="flex flex-col h-full gap-2 h-full w-28">
-                            <span class="text-lg flex justify-center font-semibold">@pizza.Price PLN</span>
-                            @* @Price.ToString("F2") *@
-                            <div class="flex gap-2 justify-center ">
-                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="DecrementQuantity">
-                                    <img src="minus.png">
+        @foreach (var pizza in pizzas)
+        {
+            <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4 ">
+                <div class="flex items-center p-4 h-full group">
+                    <div class="h-full w-80 m-6 absolute -left-32 bottom-0 group-hover:scale-[105%] duration-300">
+                        <img src="@pizza.ImageUrl" alt="@pizza.Name" class="w-full h-fit" draggable="false"/>
+                    </div>
+                    <div class="flex-grow ml-56 h-[80px] flex flex-col justify-center">
+                        <h2 class="text-[26px] mb-2 font-bold">@pizza.Name</h2>
+                        <p class="text-gray-600 text-sm">
+                            @pizza.Description
+                        </p>
+                    </div>
+                    <div class="text-right h-full">
+                        <div class="flex h-full items-center ">
+                                <div class="flex flex-col h-full gap-2 h-full w-28">
+                                    <span class="text-lg flex justify-center font-semibold">@Price[pizza.Id].ToString("F2") PLN</span>
+                                    <div class="flex gap-2 justify-center ">
+                                        <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => DecrementQuantity(pizza)">
+                                            <img src="minus.png">
+                                        </div>
+                                        <p class="font-bold">@GetQuantity(pizza)</p>
+                                        <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => IncrementQuantity(pizza)">
+                                            <img src="add.png">
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="font-bold">@Quantity</p>
-                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="IncrementQuantity">
-                                    <img src="add.png">
+                                <div class="mx-4 h-14 w-[2px] bg-black"></div>
+                                <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2">
+                                    <img src="blackcart.png">
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mx-4 h-14 w-[2px] bg-black"></div>
-                        <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2">
-                            <img src="blackcart.png">
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         }
     }
 
@@ -60,39 +59,51 @@
 
 @code {
     private List<MarioPizzeria.Models.Pizza> pizzas;
+    private Dictionary<int, int> pizzaQuantities = new Dictionary<int, int>(); // Słownik do przechowywania ilości pizzy
+    private Dictionary<int, float> Price = new Dictionary<int, float>(); // Słownik do przechowywania ilości pizzy
 
     protected override async Task OnInitializedAsync()
     {
         pizzas = await PizzaService.GetPizzasAsync();
-    }
-    //our code
-    private int Quantity { get; set; } = 1;
-    private double BasePrice { get; } = 34.90; //base cena do pobrania z bazki
-    private double Price { get; set; }
-
-    protected override void OnInitialized()
-    {
-        Price = BasePrice;
-    }
-
-    private void IncrementQuantity()
-    {
-        Quantity++;
-        UpdatePrice();
-    }
-
-    private void DecrementQuantity()
-    {
-        if (Quantity > 1)
+        if (pizzas != null)
         {
-            Quantity--;
-            UpdatePrice();
+            foreach (var pizza in pizzas)
+            {
+                Price[pizza.Id] = pizza.BasePrice; // Ustaw podstawową cenę pizzy
+                pizzaQuantities[pizza.Id] = 1; // Ustaw domyślną ilość na 1
+            }
         }
     }
 
-    private void UpdatePrice()
+    private int GetQuantity(MarioPizzeria.Models.Pizza pizza)
     {
-        Price = Quantity * BasePrice;
-        StateHasChanged();
+        // Zwraca ilość pizzy, jeśli istnieje w słowniku, lub domyślnie 1
+        return pizzaQuantities.ContainsKey(pizza.Id) ? pizzaQuantities[pizza.Id] : 1;
+    }
+
+    private void IncrementQuantity(MarioPizzeria.Models.Pizza pizza)
+    {
+        if (!pizzaQuantities.ContainsKey(pizza.Id))
+        {
+            pizzaQuantities[pizza.Id] = 1; // Ustawienie domyślnej ilości na 1
+        }
+
+        pizzaQuantities[pizza.Id]++;
+        UpdatePrice(pizza);
+    }
+
+    private void DecrementQuantity(MarioPizzeria.Models.Pizza pizza)
+    {
+        if (pizzaQuantities.ContainsKey(pizza.Id) && pizzaQuantities[pizza.Id] > 1)
+        {
+            pizzaQuantities[pizza.Id]--;
+            UpdatePrice(pizza);
+        }
+    }
+
+    private void UpdatePrice(MarioPizzeria.Models.Pizza pizza)
+    {
+        Price[pizza.Id] = pizzaQuantities[pizza.Id] * pizza.BasePrice;
+        StateHasChanged(); 
     }
 }
