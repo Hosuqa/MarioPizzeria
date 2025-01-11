@@ -1,21 +1,98 @@
 @page "/menu"
+@inject MarioPizzeria.Services.PizzaService PizzaService
+
 <div class="pt-32 flex flex-col items-center relative min-vh-100">
-    <Menu/>
-    <Menu/>
-    <Menu/>
-    <Menu/>
-    @* <div class="h-14 w-14 absolute top-[200px] right-[160px] bg-red-100 hover:scale-110 duration-300 cursor-pointer">
-        <img src="/question.png" alt="">
-    </div>
-    <div class="h-14 w-14 absolute top-[400px] left-[140px] bg-red-100 hover:scale-110 duration-300 cursor-pointer">
-        <img src="/question.png" alt="">
-    </div>
-    <div class="h-14 w-14 absolute top-[890px] right-[200px] bg-red-100 hover:scale-110 duration-300 cursor-pointer">
-        <img src="/question.png" alt="">
-    </div> *@
+    @if (pizzas == null)
+    {
+        <p>Ładowanie menu...</p>
+    }
+    else if (!pizzas.Any())
+    {
+        <p>Brak dostępnych pizz.</p>
+    }
+    else
+    {
+    @foreach (var pizza in pizzas)
+    {
+        <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4 ">
+            <div class="flex items-center p-4 h-full group">
+                <div class="h-full w-80 m-6 absolute -left-32 bottom-0 group-hover:scale-[105%] duration-300">
+                    <img src="@pizza.ImageUrl" alt="@pizza.Name" class="w-full h-fit" draggable="false"/>
+                </div>
+                <div class="flex-grow ml-56 h-[80px] flex flex-col justify-center">
+                    <h2 class="text-[26px] mb-2 font-bold">@pizza.Name</h2>
+                    <p class="text-gray-600 text-sm">
+                        @pizza.Description
+                    </p>
+                </div>
+                <div class="text-right h-full">
+                    <div class="flex h-full items-center ">
+                        <div class="flex flex-col h-full gap-2 h-full w-28">
+                            <span class="text-lg flex justify-center font-semibold">@pizza.Price PLN</span>
+                            @* @Price.ToString("F2") *@
+                            <div class="flex gap-2 justify-center ">
+                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="DecrementQuantity">
+                                    <img src="minus.png">
+                                </div>
+                                <p class="font-bold">@Quantity</p>
+                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="IncrementQuantity">
+                                    <img src="add.png">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mx-4 h-14 w-[2px] bg-black"></div>
+                        <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2">
+                            <img src="blackcart.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    }
+
     <NavLink href="cart">
         <div class="mt-4 h-fit text-white justify-between flex p-4 mx-auto bg-red-500 rounded-xl shadow-md overflow-hidden hover:bg-red-600 cursor-pointer transition-all duration-300">
             Przejdź do podsumowania
         </div>
     </NavLink>
 </div>
+
+@code {
+    private List<MarioPizzeria.Models.Pizza> pizzas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pizzas = await PizzaService.GetPizzasAsync();
+    }
+    //our code
+    private int Quantity { get; set; } = 1;
+    private double BasePrice { get; } = 34.90; //base cena do pobrania z bazki
+    private double Price { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Price = BasePrice;
+    }
+
+    private void IncrementQuantity()
+    {
+        Quantity++;
+        UpdatePrice();
+    }
+
+    private void DecrementQuantity()
+    {
+        if (Quantity > 1)
+        {
+            Quantity--;
+            UpdatePrice();
+        }
+    }
+
+    private void UpdatePrice()
+    {
+        Price = Quantity * BasePrice;
+        StateHasChanged();
+    }
+}
