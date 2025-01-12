@@ -168,8 +168,7 @@ private void CompleteOrder()
 {
     if (CartService.Items.Count == 0)
     {
-        popUpMessage = "Twój koszyk jest pusty!";
-        showPopUp = true;
+        ErrorMessage = "Twój koszyk jest pusty!";
         return;
     }
 
@@ -193,9 +192,9 @@ private void CompleteOrder()
 
     // Wyświetlenie popupa po zamówieniu
     popUpMessage = "Twoje zamówienie zostało złożone pomyślnie! Dziękujemy!";
+    ErrorMessage = "";
     CartService.ClearCart();
     showPopUp = true;
-    ErrorMessage = "";
     }
     private void SaveOrder()
     {
@@ -230,7 +229,7 @@ private void CompleteOrder()
                 foreach (var item in CartService.Items)
                 {
                     // Jeśli są uwagi, dodajemy je do CSV, jeśli nie - zostawiamy puste miejsce
-                    string uwagi = string.IsNullOrWhiteSpace(Comments) ? "" : Comments;
+                    string uwagi = string.IsNullOrWhiteSpace(Comments) ? "-" : Comments;
                     string csvLine = $"{orderDate},{FullName},{City},{Street},{Phone},{item.Name},{item.Quantity},{item.TotalPrice:F2},{uwagi}";
                     writer.WriteLine(csvLine);
                 }
