@@ -44,6 +44,29 @@ namespace MarioPizzeria.Services
                 Items.Remove(itemToRemove);
             }
         }
+        public void IncreaseQuantity(int pizzaId)
+        {
+            var item = Items.FirstOrDefault(i => i.PizzaId == pizzaId);
+            if (item != null)
+            {
+                item.Quantity++;
+                item.TotalPrice = item.Quantity * (item.TotalPrice / (item.Quantity - 1)); // Przeliczenie ceny
+            }
+        }
+
+        public void DecreaseQuantity(int pizzaId)
+        {
+            var item = Items.FirstOrDefault(i => i.PizzaId == pizzaId);
+            if (item != null && item.Quantity > 1)
+            {
+                item.Quantity--;
+                item.TotalPrice = item.Quantity * (item.TotalPrice / (item.Quantity + 1)); // Przeliczenie ceny
+            }
+            else
+            {
+                RemoveFromCart(pizzaId); // Usunięcie, jeśli ilość spadnie do 0
+            }
+        }
     }
 
     public class CartItem

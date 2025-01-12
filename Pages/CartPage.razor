@@ -1,7 +1,7 @@
 @page "/cart"
 @inject MarioPizzeria.Services.CartService CartService
 
-<div class="flex justify-center gap-4 min-vh-100">
+<div class="flex justify-center gap-4 min-vh-100 ">
     <div class="mt-32 h-fit  flex flex-col gap-4">
         @foreach (var item in CartService.Items)
         {
@@ -10,26 +10,27 @@
                 <div class="h-full w-[100px] flex">
                     <img src="@($"{item.Name}.png")" alt="Peperoni" class="w-full h-full" draggable="false"/>
                 </div>
-                <div class="flex-grow ml-4 h-[20px] flex flex-col justify-center">
+                <div class="flex-grow ml-4 flex flex-col justify-center">
                     <h2 class="text-[26px] mb-2 font-bold">@item.Name</h2>
-                    <p class="text-gray-600 text-sm">@item.Description </p>
+                    <p class="text-gray-600 text-sm w-[250px]">@item.Description </p>
                 </div>
                 <div class="text-right h-full">
                     <div class="flex h-full items-center ">
                         <div class="flex flex-col h-full gap-2 w-28">
                             <span class="text-lg flex justify-center font-semibold">@item.TotalPrice.ToString("F2") PLN</span>
                             <div class="flex gap-2 justify-center ">
-                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" >
+                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => DecreaseQuantity(item.PizzaId)">
                                     <img src="minus.png">
                                 </div>
                                 <p class="font-bold">@item.Quantity</p>
-                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" >
+                                <div class="w-6 h-full cursor-pointer hover:scale-125 duration-300" @onclick="() => IncreaseQuantity(item.PizzaId)">
                                     <img src="add.png">
                                 </div>
                             </div>
                         </div>
+                        <div class="h-14 mx-2 w-[2px] bg-black "></div>
                         <div class="m-2 w-10 h-10 flex items-center justify-center ">
-                            <span class="cursor-pointer material-icons text-stone-700 "style="font-size: 35px;" @onclick="() => RemoveItem(item.PizzaId)">delete</span>
+                            <span class="cursor-pointer material-icons text-stone-700 hover:text-black duration-300 "style="font-size: 35px;" @onclick="() => RemoveItem(item.PizzaId)">delete</span>
                         </div>
                     </div>
                 </div>
@@ -44,17 +45,155 @@
         </NavLink>
     </div>
     <div class="gap-4 flex flex-col">
-        <CartContact/>
-        <div class="w-full justify-between flex p-4 mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-            <p class="text-xl">Razem:</p>
-            <p class="text-xl font-bold">@CartService.GetTotalPrice().ToString("F2") PLN</p>
+        @* contacy box *@
+        <div class="mt-32 w-[450px] flex flex-col items-center z-50">
+            <div class="w-full p-4 mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+                <form class="flex flex-col gap-3">
+                    <label>
+                        <div class="flex flex-col">
+                            <p class="mb-2">Imię i nazwisko:  </p>
+                            <input type="text" name="fullname" class="border border-gray-300 p-2 rounded" @bind="FullName">
+                        </div>
+                    </label>
+                    <label>
+                        <div class="flex flex-col">
+                            <p class="mb-2">Miejscowość: </p>
+                            <input type="text" name="city" class="border border-gray-300 p-2 rounded" @bind="City">
+                        </div>
+                    </label>
+                    <label>
+                        <div class="flex flex-col">
+                            <p class="mb-2">Ulica: </p>
+                            <input type="text" name="street" class="border border-gray-300 p-2 rounded" @bind="Street">
+                        </div>
+                    </label>
+                    <label>
+                        <div class="flex flex-col">
+                            <p class="mb-2">Numer telefonu: </p>
+                            <input type="tel" name="phone" class="border border-gray-300 p-2 rounded" @bind="Phone">
+                        </div>
+                    </label>
+                </form>
+            </div>
+        </div>
+            <div class="w-full  p-4 mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl z-50">
+                <div class="justify-between flex">
+                    <p class="text-xl">Razem:</p>
+                    <p class="text-xl font-bold">@CartService.GetTotalPrice().ToString("F2") PLN</p>
+                </div>
+                <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 mt-4 py-2 rounded duration-300" @onclick="CompleteOrder">
+                    Zamów
+                </button>
+            </div>
         </div>
     </div>
-</div>
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white h-fit w-[600px] rounded-xl shadow-md py-8 px-12 text-center relative">
+            <!-- Przycisk zamykania (X) -->
+            <button class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 transition-all duration-200"
+                    @onclick="ClosePopUp">
+                <span class="material-icons">close</span>
+            </button>
 
+            <p class="text-black mb-4 mt-2">@ErrorMessage</p>
+            <div class="flex flex-row items-center justify-center gap-2">
+                <button class="px-6 py-2 w-[200px] bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300" @onclick="ClosePopUp">
+                    Powrót
+                </button>
+            </div>
+        </div>
+    </div>
+}
+@if (showPopUp)
+{
+    <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white h-fit w-[600px] rounded-xl shadow-md p-6 text-center relative">
+            <!-- Przycisk zamykania (X) -->
+            <button class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 transition-all duration-200"
+                    @onclick="ClosePopUp">
+                <span class="material-icons">close</span>
+            </button>
+
+            <h2 class="text-2xl font-bold ">Zamówienie</h2>
+            <p class="text-lg my-4">@popUpMessage</p>
+            <div class="flex flex-row items-center justify-center gap-2">
+                <NavLink href=""> 
+                    <button type="submit" class="px-6 py-2 w-[300px] bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300">
+                        Powrót do strony głównej
+                    </button>
+                </NavLink>
+            </div>
+        </div>
+    </div>
+}
 @code {
     private void RemoveItem(int pizzaId)
     {
         CartService.RemoveFromCart(pizzaId);
+        StateHasChanged(); // Odświeżenie widoku
+    }
+
+    private void IncreaseQuantity(int pizzaId)
+    {
+        CartService.IncreaseQuantity(pizzaId);
+        StateHasChanged(); // Aktualizacja widoku
+    }
+
+    private void DecreaseQuantity(int pizzaId)
+    {
+        CartService.DecreaseQuantity(pizzaId);
+        StateHasChanged(); // Aktualizacja widoku
+    }
+    ///popup
+    private bool showPopUp = false;
+    private string popUpMessage = "Twoje zamówienie zostało złożone pomyślnie!";
+
+    // Zmienne przechowujące dane formularza
+    private string FullName { get; set; } = "";
+    private string City { get; set; } = "";
+    private string Street { get; set; } = "";
+    private string Phone { get; set; } = "";
+    private string ErrorMessage { get; set; } = "";
+
+    private void CompleteOrder()
+    {
+        // Sprawdzenie, czy koszyk jest pusty
+        if (CartService.Items.Count == 0)
+        {
+            popUpMessage = "Twój koszyk jest pusty!";
+            showPopUp = true;
+            return;
+        }
+
+        // Walidacja pól formularza
+        if (string.IsNullOrWhiteSpace(FullName) ||
+            string.IsNullOrWhiteSpace(City) ||
+            string.IsNullOrWhiteSpace(Street) ||
+            string.IsNullOrWhiteSpace(Phone))
+        {
+            ErrorMessage = "Wszystkie pola (Imię i nazwisko, Miejscowość, Ulica, Telefon) muszą być wypełnione!";
+            return;
+        }
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(Phone, @"^\d{9}$"))
+        {
+            ErrorMessage = "Numer telefonu musi składać się z 9 cyfr!";
+            return;
+        }
+
+        // Jeśli wszystko jest poprawne, wyświetl popup
+        popUpMessage = "Twoje zamówienie zostało złożone pomyślnie! Dziękujemy!";
+        CartService.ClearCart(); // Wyczyść koszyk po zamówieniu
+        showPopUp = true;
+        ErrorMessage = ""; // Zresetuj błąd
+    }
+
+    private void ClosePopUp()
+    {
+        showPopUp = false;
+        ErrorMessage = ""; // Resetuj komunikat błędu
+        StateHasChanged();
     }
 }
