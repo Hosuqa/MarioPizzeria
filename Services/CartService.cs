@@ -35,7 +35,7 @@ namespace MarioPizzeria.Services
         //usuwanie z koszyka
         public void RemoveFromCart(int pizzaId)
         {
-            var itemToRemove = Items.FirstOrDefault(item => item.PizzaId == pizzaId);
+            var itemToRemove = Items.Find(item => item.PizzaId == pizzaId);
             if (itemToRemove != null)
             {
                 Items.Remove(itemToRemove);
@@ -43,7 +43,7 @@ namespace MarioPizzeria.Services
         }
         public void IncreaseQuantity(int pizzaId)
         {
-            var item = Items.FirstOrDefault(i => i.PizzaId == pizzaId);
+            var item = Items.Find(i => i.PizzaId == pizzaId);
             if (item != null)
             {
                 item.Quantity++;
@@ -53,7 +53,7 @@ namespace MarioPizzeria.Services
 
         public void DecreaseQuantity(int pizzaId)
         {
-            var item = Items.FirstOrDefault(i => i.PizzaId == pizzaId);
+            var item = Items.Find(i => i.PizzaId == pizzaId);
             if (item != null && item.Quantity > 1)
             {
                 item.Quantity--;
