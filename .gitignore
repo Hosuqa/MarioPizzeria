@@ -3,6 +3,8 @@ bin/
 obj/
 bin/*
 obj/*
+Orders/
+Orders/*
 
 # Zależności NuGet
 *.nupkg

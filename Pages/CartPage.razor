@@ -76,7 +76,7 @@
                     <label>
                     <div class="flex flex-col">
                         <p class="mb-2">Uwagi do zamówienia: </p>
-                        <textarea name="comments" class="border border-gray-300 p-3 rounded"></textarea>
+                        <textarea name="comments" class="border border-gray-300 p-3 rounded" @bind="Comments"></textarea>
                     </div>
                 </label>
                 </form>
@@ -162,40 +162,104 @@
     private string Street { get; set; } = "";
     private string Phone { get; set; } = "";
     private string ErrorMessage { get; set; } = "";
+    private string Comments { get; set; } = "";
 
-    private void CompleteOrder()
+private void CompleteOrder()
+{
+    if (CartService.Items.Count == 0)
     {
-        // Sprawdzenie, czy koszyk jest pusty
-        if (CartService.Items.Count == 0)
-        {
-            popUpMessage = "Twój koszyk jest pusty!";
-            showPopUp = true;
-            return;
-        }
-
-        // Walidacja pól formularza
-        if (string.IsNullOrWhiteSpace(FullName) ||
-            string.IsNullOrWhiteSpace(City) ||
-            string.IsNullOrWhiteSpace(Street) ||
-            string.IsNullOrWhiteSpace(Phone))
-        {
-            ErrorMessage = "Wszystkie pola (Imię i nazwisko, Miejscowość, Ulica, Telefon) muszą być wypełnione!";
-            return;
-        }
-
-        if (!System.Text.RegularExpressions.Regex.IsMatch(Phone, @"^\d{9}$"))
-        {
-            ErrorMessage = "Numer telefonu musi składać się z 9 cyfr!";
-            return;
-        }
-
-        // Jeśli wszystko jest poprawne, wyświetl popup
-        popUpMessage = "Twoje zamówienie zostało złożone pomyślnie! Dziękujemy!";
-        CartService.ClearCart(); // Wyczyść koszyk po zamówieniu
+        popUpMessage = "Twój koszyk jest pusty!";
         showPopUp = true;
-        ErrorMessage = ""; // Zresetuj błąd
+        return;
     }
 
+    if (string.IsNullOrWhiteSpace(FullName) ||
+        string.IsNullOrWhiteSpace(City) ||
+        string.IsNullOrWhiteSpace(Street) ||
+        string.IsNullOrWhiteSpace(Phone))
+    {
+        ErrorMessage = "Wszystkie pola (Imię i nazwisko, Miejscowość, Ulica, Telefon) muszą być wypełnione!";
+        return;
+    }
+
+    if (!System.Text.RegularExpressions.Regex.IsMatch(Phone, @"^\d{9}$"))
+    {
+        ErrorMessage = "Numer telefonu musi składać się z 9 cyfr!";
+        return;
+    }
+
+    // Zapisz zamówienie do pliku CSV
+    SaveOrder();
+
+    // Wyświetlenie popupa po zamówieniu
+    popUpMessage = "Twoje zamówienie zostało złożone pomyślnie! Dziękujemy!";
+    CartService.ClearCart();
+    showPopUp = true;
+    ErrorMessage = "";
+    }
+    private void SaveOrder()
+    {
+        string directoryPath = "Orders"; // Zmiana na folder "Orders"
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        // Tworzenie nazwy pliku na podstawie daty i godziny
+        string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        string csvFileName = $"orders_{timestamp}.csv";
+        string csvFilePath = Path.Combine(directoryPath, csvFileName);
+
+        string txtFileName = $"order_details_{timestamp}.txt";
+        string txtFilePath = Path.Combine(directoryPath, txtFileName);
+
+        bool fileExists = File.Exists(csvFilePath);
+
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(csvFilePath, true))
+            {
+                // Dodaj nagłówki, jeśli plik nie istnieje
+                if (!fileExists)
+                {
+                    writer.WriteLine("DataZamowienia,ImieINazwisko,Miejscowosc,Ulica,Telefon,NazwaPizzy,Ilosc,CenaCalkowita,Uwagi");
+                }
+
+                string orderDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                foreach (var item in CartService.Items)
+                {
+                    // Jeśli są uwagi, dodajemy je do CSV, jeśli nie - zostawiamy puste miejsce
+                    string uwagi = string.IsNullOrWhiteSpace(Comments) ? "" : Comments;
+                    string csvLine = $"{orderDate},{FullName},{City},{Street},{Phone},{item.Name},{item.Quantity},{item.TotalPrice:F2},{uwagi}";
+                    writer.WriteLine(csvLine);
+                }
+            }
+
+            // Tworzenie pliku TXT z danymi zamówienia
+            using (StreamWriter txtWriter = new StreamWriter(txtFilePath))
+            {
+                txtWriter.WriteLine($"Data zamówienia: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                txtWriter.WriteLine($"Imię i nazwisko: {FullName}");
+                txtWriter.WriteLine($"Miejscowość: {City}");
+                txtWriter.WriteLine($"Ulica: {Street}");
+                txtWriter.WriteLine($"Telefon: {Phone}");
+                if (!string.IsNullOrWhiteSpace(Comments))
+                {
+                    txtWriter.WriteLine($"Uwagi: {Comments}");
+                }
+                txtWriter.WriteLine("\nLista zamówionych pizz:");
+                foreach (var item in CartService.Items)
+                {
+                    txtWriter.WriteLine($"- {item.Name}, ilość: {item.Quantity}, cena: {item.TotalPrice:F2} PLN");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Błąd podczas zapisu zamówienia: " + ex.Message;
+        }
+    }
     private void ClosePopUp()
     {
         showPopUp = false;
