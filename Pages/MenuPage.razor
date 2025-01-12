@@ -21,7 +21,7 @@
         </div>
         @foreach (var pizza in pizzas)
         {
-            <div class="w-[800px] group hover:bg-[#FEEFEF] duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4">
+            <div class="w-[800px] group hover:bg-red-50 duration-300 mx-auto bg-[#fff] rounded-xl shadow-md overflow-hidden relative h-full mb-4">
                 <div class="flex items-center p-4 h-full group">
                     <div class="h-full w-80 m-6 absolute -left-32 bottom-10 group-hover:scale-[105%] duration-300">
                         <img src="@($"{pizza.Name}.png")" alt="@pizza.Name" class="w-full h-fit" draggable="false"/>
@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <div class="mx-4 h-14 w-[2px] bg-black"></div>
-                            <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2" @onclick="() => HandleCartAndPopUp(pizza)">
+                            <div class="w-12 text-black h-full cursor-pointer hover:scale-110 duration-300 mx-2" @onclick="() => HandleCart(pizza)">
                                 <img src="blackcart.png">
                             </div>
                         </div>
@@ -54,7 +54,6 @@
             </div>
         }
     }
-
     <NavLink href="cart">
         <div class="mb-4 h-fit text-white justify-between flex p-4 mx-auto bg-red-500 rounded-xl shadow-md overflow-hidden hover:bg-red-600 cursor-pointer transition-all duration-300">
             Przejdź do podsumowania
@@ -62,46 +61,40 @@
     </NavLink>
 </div>
 
-@if (showPopUp)
+@if (CartService.Items.Any())
 {
-    <div class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
-        <div class="bg-white h-fit w-[600px] rounded-xl shadow-md p-6 text-center relative">
-            <!-- Przycisk zamykania (X) -->
-            <button class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 transition-all duration-200"
-                    @onclick="ClosePopUp">
-                <span class="material-icons">close</span>
-            </button>
-
-            <h2 class="text-2xl font-bold mb-4">Zamówienie</h2>
-            <p class="text-lg">@popUpMessage</p>
-
-            <!-- Licznik czasu do zamknięcia -->
-            <p class="text-sm text-gray-500 my-2">Zamknięcie za: <span class="font-bold">@popupCountdown</span> s</p>
-
-            <div class="flex flex-row items-center justify-center mt-3 gap-2">
-                <div>
-                    <button class="px-6 py-2 w-[180px] bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300"
-                            @onclick="ClosePopUp">
-                        Kontynuuj zakupy
-                    </button>
+    <div class="fixed bottom-4 left-4 bg-white p-4 rounded-lg shadow-lg w-80 max-h-[700px] overflow-y-auto">
+        <h2 class="text-lg font-bold mb-2">Podsumowanie koszyka</h2>
+        @foreach (var item in CartService.Items)
+        {
+            <div class="flex items-center justify-between mb-2 border-b pb-2">
+                <img src="@($"{item.Name}.png")" alt="@item.Name" class="w-12 h-12 rounded-lg mr-2">
+                <div class="flex-grow">
+                    <p class="font-semibold">@item.Name</p>
+                    <p class="text-sm text-gray-600">Ilość: @item.Quantity</p>
+                    <p class="text-sm text-gray-600">Cena: @item.TotalPrice.ToString("F2") PLN</p>
                 </div>
-                <NavLink href="cart"> 
-                    <button class="px-6 py-2 w-[180px] bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300">
-                        Podsumowanie
-                    </button>
-                </NavLink>
+                <button class="text-red-500 text-sm font-semibold hover:underline"
+                        @onclick="() => RemoveItem(item.PizzaId)">
+                        <span class="cursor-pointer material-icons text-stone-700 hover:text-black duration-300 "style="font-size: 25px;">delete</span>
+                </button>
             </div>
+        }
+        <div class="mt-2 text-right font-bold">
+            Suma: @CartService.GetTotalPrice().ToString("F2") PLN
         </div>
+        <NavLink href="cart">
+            <button class="mt-2 bg-red-500 text-white px-4 py-2 w-full rounded-lg hover:bg-red-600 transition-all duration-300">
+                Przejdź do koszyka
+            </button>
+        </NavLink>
     </div>
 }
+
 @code {
     private List<MarioPizzeria.Models.Pizza>? pizzas;
     private Dictionary<int, int> pizzaQuantities = new Dictionary<int, int>();
     private Dictionary<int, float> Price = new Dictionary<int, float>();
-
-    private bool showPopUp = false;
-    private string popUpMessage = "";
-    private int popupCountdown;
     protected override async Task OnInitializedAsync()
     {
         pizzas = await PizzaService.GetPizzasAsync();
@@ -156,40 +149,15 @@
             pizza.BasePrice
         );
     }
-
- private async Task ShowPopUp(MarioPizzeria.Models.Pizza pizza)
-    {
-        var quantity = GetQuantity(pizza);
-        popUpMessage = $"Dodałeś {quantity} pizze {pizza.Name} ({Price[pizza.Id]} PLN)";
-        showPopUp = true;
-        popupCountdown = 8;
-        StateHasChanged();
-
-        while (popupCountdown > 0)
-        {
-            await Task.Delay(1000);
-            popupCountdown--;
-            StateHasChanged();
-        }
-
-        if (showPopUp) // Jeśli użytkownik nie zamknął popupu ręcznie
-        {
-            ClosePopUp();
-        }
-    }
-
-    private void ClosePopUp()
-    {
-        showPopUp = false;
-        popupCountdown = 0;
-        StateHasChanged();
-    }
-
-    private async Task HandleCartAndPopUp(MarioPizzeria.Models.Pizza pizza)
+    private void HandleCart(MarioPizzeria.Models.Pizza pizza)
     {
         AddToCart(pizza);
-        await ShowPopUp(pizza);
         pizzaQuantities[pizza.Id] = 1;
         Price[pizza.Id] = pizza.BasePrice;
+    }
+    private void RemoveItem(int pizzaId)
+    {
+        CartService.RemoveFromCart(pizzaId);
+        StateHasChanged();
     }
 }
