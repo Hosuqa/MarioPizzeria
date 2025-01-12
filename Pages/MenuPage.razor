@@ -3,7 +3,7 @@
 @inject MarioPizzeria.Services.CartService CartService
 
 <div class="pt-32 flex flex-col items-center relative min-vh-100">
-    <img src="/mariopizza.png" alt="" class="absolute top-[650px]  -right-20 h-[800px] ">
+    <img src="/mariopizza.png" alt="" class="absolute top-[650px]  -right-20 h-[800px]" draggable="false">
     @if (pizzas == null)
     {
         <p>Ładowanie menu...</p>
@@ -109,23 +109,18 @@
 
     private int GetQuantity(MarioPizzeria.Models.Pizza pizza)
     {
-        return pizzaQuantities.ContainsKey(pizza.Id) ? pizzaQuantities[pizza.Id] : 1;
+        return pizzaQuantities[pizza.Id];
     }
 
     private void IncrementQuantity(MarioPizzeria.Models.Pizza pizza)
     {
-        if (!pizzaQuantities.ContainsKey(pizza.Id))
-        {
-            pizzaQuantities[pizza.Id] = 1;
-        }
-
         pizzaQuantities[pizza.Id]++;
         UpdatePrice(pizza);
     }
 
     private void DecrementQuantity(MarioPizzeria.Models.Pizza pizza)
     {
-        if (pizzaQuantities.ContainsKey(pizza.Id) && pizzaQuantities[pizza.Id] > 1)
+        if (pizzaQuantities[pizza.Id] > 1)
         {
             pizzaQuantities[pizza.Id]--;
             UpdatePrice(pizza);
